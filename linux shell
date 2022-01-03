@@ -4,3 +4,22 @@ bbmap/bbduk.sh maxns=1 maq=20 trimq=20 qtrim=rl ktrim=r ordered minlen=100 minle
 
 # multiplex fastq
 for i in `ls -1 *_1.fastq.gz | sed 's/_1.fastq.gz//'`; do ~/Analysis/tool/bbmap/bbduk.sh maxns=1 maq=20 trimq=20 qtrim=rl ktrim=r ordered minlen=100 minlenfraction=0.33 tbo=t tpe=t rcomp=f k=23 ow=t zl=4 in1=$i\_1.fastq.gz in2=$i\_2.fastq.gz out1=$i\QC_1.fastq.gz out2=$i\QC_2.fastq.gz ref=~/Analysis/tool/bbmap/resources/adapters.fa;done
+
+mixcr align --species hsa ERR1391677_1.fastq.gz ERR1391677_2.fastq.gz out.vdjca
+mixcr exportAlignments -c IGH out.vdjca out.txt
+mixcr assemble -a out.vdjca output.clna
+mixcr exportClones output.clna clones.txt
+
+mixcr assembleContigs --report report.txt clones.clna full_clones.clns
+
+# export full BCR receptors
+mixcr exportClones -c IG -p fullImputed full_clones.clns full_clones.txt
+
+
+# alignment data organization
+remove='3,4,5,6,21,30'
+for i in `ls -1 *.txt | sed 's/.txt//'` ; do cut -f$remove $i.txt > $i_clean.txt; done
+
+# clone data organization
+remove='1,2,3,4,6,7,8,9,24,33,35'
+for i in `ls -1 *.txt | sed 's/.txt//'` ; do cut -f$remove $i.txt > $i_clean.txt; done
